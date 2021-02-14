@@ -1,0 +1,51 @@
+version: "3.7"
+
+services:
+  web:
+    image: nginx:alpine
+    container_name: web
+    ports:
+      - 8083:80
+    volumes:
+      - type: bind
+        source: ./
+        target: /var/www
+        consistency: cached
+      - ./docker/web/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      www:
+        aliases:
+          - api.local
+
+  phpfpm:
+    build:
+      context: ./docker
+      dockerfile: php.dockerfile
+    volumes:
+      - type: bind
+        source: ./
+        target: /var/www
+        consistency: cached
+      - ./tmp/grinds:/tmp/grinds
+    networks:
+      - www
+    working_dir: /var/www
+
+  mysql:
+    image: mysql:5.7.28
+    container_name: mysql3
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "4306:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: DBname
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - www
+networks:
+  www:
