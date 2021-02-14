@@ -17,7 +17,7 @@ cd web
 
 composer update
 
-REST API INTRODUCTION
+REST API - INTRODUCTION
 ------------
 
 Make a REST API supporting the following methods:
